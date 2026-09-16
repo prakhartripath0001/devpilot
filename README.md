@@ -1,38 +1,38 @@
-# DevPilot 🚀
+# DevPilot
 
 DevPilot is an AI-powered developer assistant and engineering intelligence platform built with a modern full-stack architecture featuring Next.js, Spring Boot, Spring AI, and PostgreSQL with pgvector.
 
 ---
 
-## 🏗️ Architecture & Tech Stack
+## Architecture and Tech Stack
 
 ### Frontend (`/client`)
-- **Framework:** [Next.js 16](https://nextjs.org/) (App Router) & [React 19](https://react.dev/)
+- **Framework:** [Next.js 16](https://nextjs.org/) (App Router) and [React 19](https://react.dev/)
 - **Language:** TypeScript
-- **Styling:** [Tailwind CSS v4](https://tailwindcss.com/) & [shadcn/ui](https://ui.shadcn.com/)
+- **Styling:** [Tailwind CSS v4](https://tailwindcss.com/) and [shadcn/ui](https://ui.shadcn.com/)
 - **Theming:** `next-themes` (Dark / Light / System mode support)
 - **Data Fetching:** [TanStack React Query](https://tanstack.com/query/latest)
-- **Icons & Visuals:** `lucide-react`, `recharts`
+- **Icons and Visuals:** `lucide-react`, `recharts`
 
 ### Backend (`/backend`)
 - **Framework:** [Spring Boot 4](https://spring.io/projects/spring-boot)
-- **Language & Runtime:** Java 21
-- **AI Integration:** [Spring AI](https://spring.io/projects/spring-ai) (OpenAI Models & Text Embeddings)
+- **Language and Runtime:** Java 21
+- **AI Integration:** [Spring AI](https://spring.io/projects/spring-ai) (OpenAI Models and Text Embeddings)
 - **Persistence:** Spring Data JPA / Hibernate
 - **Database Migrations:** [Flyway](https://flywaydb.org/)
-- **Security:** Spring Security & OAuth2 Client
+- **Security:** Spring Security and OAuth2 Client
 
-### Database & Infrastructure
+### Database and Infrastructure
 - **Database:** PostgreSQL 16 via [pgvector/pgvector:pg16](https://hub.docker.com/r/pgvector/pgvector)
 - **Extensions:**
-  - `vector` (Vector embeddings & semantic search)
+  - `vector` (Vector embeddings and semantic search)
   - `uuid-ossp` (UUID generation)
   - `hstore` (Key-value pairs storage)
 - **Orchestration:** Docker Compose
 
 ---
 
-## 📁 Project Structure
+## Project Structure
 
 ```text
 devpilot/
@@ -46,9 +46,9 @@ devpilot/
 │   ├── mvnw
 │   └── pom.xml
 ├── client/                        # Next.js Frontend Application
-│   ├── app/                       # App Router pages & layout
-│   ├── components/                # UI & Provider components
-│   │   ├── provider/              # Theme & context providers
+│   ├── app/                       # App Router pages and layout
+│   ├── components/                # UI and Provider components
+│   │   ├── provider/              # Theme and context providers
 │   │   └── ui/                    # Reusable shadcn/ui components
 │   ├── lib/                       # Utility functions
 │   └── package.json
@@ -61,16 +61,16 @@ devpilot/
 
 ---
 
-## 🛠️ Prerequisites
+## Prerequisites
 
 Make sure you have the following installed on your machine:
 - [Docker](https://www.docker.com/) and Docker Compose
-- [Node.js](https://nodejs.org/) (v20+ recommended) & `npm`
+- [Node.js](https://nodejs.org/) (v20+ recommended) and `npm`
 - [Java Development Kit (JDK 21)](https://adoptium.net/)
 
 ---
 
-## 🚀 Getting Started
+## Getting Started
 
 ### 1. Start the Database (PostgreSQL + pgvector)
 
@@ -88,7 +88,7 @@ docker compose ps
 
 The database will automatically initialize extensions (`vector`, `hstore`, `"uuid-ossp"`).
 
-### 2. Configure & Run Backend
+### 2. Configure and Run Backend
 
 Set your OpenAI API key as an environment variable:
 
@@ -120,7 +120,7 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ---
 
-## ⚙️ Configuration Reference
+## Configuration Reference
 
 ### Backend (`application.properties`)
 
@@ -138,7 +138,7 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ---
 
-## 🗄️ Database Migrations (Flyway)
+## Database Migrations (Flyway)
 
 Place versioned SQL scripts in `backend/src/main/resources/db/migration/`:
 - **Naming Pattern:** `V<Version>__<Description>.sql` (e.g., `V1__init_schema.sql`, note the double underscore `__`).
