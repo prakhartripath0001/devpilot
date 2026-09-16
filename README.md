@@ -20,7 +20,7 @@ DevPilot is an AI-powered developer assistant and engineering intelligence platf
 - **AI Integration:** [Spring AI](https://spring.io/projects/spring-ai) (OpenAI Models and Text Embeddings)
 - **Persistence:** Spring Data JPA / Hibernate
 - **Database Migrations:** [Flyway](https://flywaydb.org/)
-- **Security:** Spring Security and OAuth2 Client
+- **Security:** Spring Security and OAuth2 Client (GitHub)
 
 ### Database and Infrastructure
 - **Database:** PostgreSQL 16 via [pgvector/pgvector:pg16](https://hub.docker.com/r/pgvector/pgvector)
@@ -40,9 +40,15 @@ devpilot/
 │   ├── src/
 │   │   ├── main/
 │   │   │   ├── java/devPilot/backend/
+│   │   │   │   ├── config/        # Security and app configuration
+│   │   │   │   ├── entity/        # JPA entities
+│   │   │   │   ├── exceptions/    # Custom exceptions and global handler
+│   │   │   │   ├── repository/    # Spring Data repositories
+│   │   │   │   └── service/       # Business logic services
 │   │   │   └── resources/
 │   │   │       ├── application.properties
-│   │   │       └── db/migration/  # Flyway SQL migrations (e.g. V1__init_schema.sql)
+│   │   │       └── db/migration/  # Flyway SQL migrations
+│   ├── .env                       # Environment variables (gitignored)
 │   ├── mvnw
 │   └── pom.xml
 ├── client/                        # Next.js Frontend Application
@@ -51,10 +57,11 @@ devpilot/
 │   │   ├── provider/              # Theme and context providers
 │   │   └── ui/                    # Reusable shadcn/ui components
 │   ├── lib/                       # Utility functions
+│   ├── .env                       # Environment variables (gitignored)
 │   └── package.json
 ├── docker/
 │   └── postgres/
-│       └── init-extension.sql     # Database initialization script (extensions)
+│       └── init-extension.sql     # Database initialization script
 ├── docker-compose.yml             # Postgres + pgvector service definition
 └── README.md
 ```
@@ -72,7 +79,35 @@ Make sure you have the following installed on your machine:
 
 ## Getting Started
 
-### 1. Start the Database (PostgreSQL + pgvector)
+### 1. Clone and Configure Environment Variables
+
+Copy the `.env` template files and fill in your credentials:
+
+**Backend** (`backend/.env`):
+```bash
+cp backend/.env.example backend/.env
+```
+
+| Variable | Description |
+|---|---|
+| `DB_URL` | PostgreSQL connection URL |
+| `DB_USERNAME` | Database username |
+| `DB_PASSWORD` | Database password |
+| `OPENAI_API_KEY` | OpenAI API Key |
+| `GITHUB_CLIENT_ID` | GitHub OAuth2 App Client ID |
+| `GITHUB_CLIENT_SECRET` | GitHub OAuth2 App Client Secret |
+| `SERVER_PORT` | Spring Boot server port (default: `8080`) |
+
+**Client** (`client/.env`):
+
+| Variable | Description |
+|---|---|
+| `NEXT_PUBLIC_API_URL` | Backend API base URL (default: `http://localhost:8080`) |
+| `NEXT_PUBLIC_GITHUB_CLIENT_ID` | GitHub OAuth2 Client ID (public) |
+
+> ⚠️ **Important:** Never commit `.env` files. They are gitignored by default.
+
+### 2. Start the Database (PostgreSQL + pgvector)
 
 Start the containerized PostgreSQL database using Docker Compose:
 
@@ -88,13 +123,7 @@ docker compose ps
 
 The database will automatically initialize extensions (`vector`, `hstore`, `"uuid-ossp"`).
 
-### 2. Configure and Run Backend
-
-Set your OpenAI API key as an environment variable:
-
-```bash
-export OPENAI_API_KEY="your-openai-api-key"
-```
+### 3. Configure and Run Backend
 
 Navigate to the `backend` directory and run the application:
 
@@ -106,7 +135,7 @@ cd backend
 The backend server will start at `http://localhost:8080`.
 Flyway will automatically apply any pending migrations located in `src/main/resources/db/migration/`.
 
-### 3. Run Frontend
+### 4. Run Frontend
 
 In a new terminal window, navigate to the `client` directory:
 
@@ -120,21 +149,16 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ---
 
-## Configuration Reference
+## Environment Variables
 
-### Backend (`application.properties`)
+All sensitive configuration is managed via `.env` files that are **gitignored**. The backend uses Spring's `${VAR:default}` syntax to read environment variables with sensible defaults for local development.
 
-| Property | Default Value | Description |
-|---|---|---|
-| `spring.datasource.url` | `jdbc:postgresql://localhost:5432/devpilot` | PostgreSQL connection URL |
-| `spring.datasource.username` | `postgres` | Database username |
-| `spring.datasource.password` | `postgres` | Database password |
-| `spring.jpa.hibernate.ddl-auto` | `validate` | Schema validation mode |
-| `spring.flyway.enabled` | `true` | Enables Flyway migrations |
-| `spring.ai.openai.api-key` | `${OPENAI_API_KEY}` | OpenAI API Key |
-| `spring.ai.openai.chat.model` | `gpt-4o-mini` | Chat completion model |
-| `spring.ai.openai.embedding.model` | `text-embedding-3-small` | Vector embedding model |
-| `server.port` | `8080` | Spring Boot server port |
+```properties
+# Example: backend/application.properties
+spring.datasource.url=${DB_URL:jdbc:postgresql://localhost:5432/devpilot}
+spring.datasource.username=${DB_USERNAME:postgres}
+spring.datasource.password=${DB_PASSWORD:postgres}
+```
 
 ---
 
