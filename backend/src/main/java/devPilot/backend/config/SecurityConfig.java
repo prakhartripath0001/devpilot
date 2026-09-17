@@ -14,7 +14,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import lombok.RequiredArgsConstructor;
 
-import devPilot.backend.service.GitHubOAuth2UserService;
+import devPilot.backend.security.GitHubOAuth2UserService;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.util.List;

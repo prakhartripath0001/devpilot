@@ -22,7 +22,30 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
-    public String decryptAccessTokem(User user) {
+    public String decryptAccessToken(User user) {
         return tokenEncryptor.decrypt(user.getAccessToken());
+    }
+
+    @Transactional
+    public User upsertFromOAuth2(Long githubId, String githubUsername, String displayName,
+            String avatarUrl, String accessToken, String tokenScope) {
+        User user = userRepository.findByGithubId(githubId)
+                .map(existingUser -> {
+                    existingUser.setGithubUsername(githubUsername);
+                    existingUser.setDisplayName(displayName);
+                    existingUser.setAvatarUrl(avatarUrl);
+                    existingUser.setAccessToken(tokenEncryptor.encrypt(accessToken));
+                    existingUser.setTokenScope(tokenScope);
+                    return existingUser;
+                })
+                .orElseGet(() -> User.builder()
+                        .githubId(githubId)
+                        .githubUsername(githubUsername)
+                        .displayName(displayName)
+                        .avatarUrl(avatarUrl)
+                        .accessToken(tokenEncryptor.encrypt(accessToken))
+                        .tokenScope(tokenScope)
+                        .build());
+        return userRepository.save(user);
     }
 }
