@@ -27,6 +27,7 @@ public class SecurityConfig {
         private final GitHubOAuth2UserService gitHubOAuth2UserService;
         private final OAuth2SuccessHandler oAuth2SuccessHandler;
         private final OAuth2FailureHandler oAuth2FailureHandler;
+        private final CorsConfig corsConfig;
 
         @Bean
         public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -58,7 +59,7 @@ public class SecurityConfig {
                                                 })
                                                 .invalidateHttpSession(true)
                                                 .clearAuthentication(true)
-                                                .deleteCookies("JSESSIONID"));
+                                                .deleteCookies("DEVPILOT_SESSION"));
 
                 return http.build();
         }
@@ -66,9 +67,10 @@ public class SecurityConfig {
         @Bean
         public CorsConfigurationSource corsConfigurationSource() {
                 CorsConfiguration configuration = new CorsConfiguration();
-                configuration.setAllowedOrigins(List.of("http://localhost:3000"));
+                configuration.setAllowedOrigins(corsConfig.getAllowedOrigins());
                 configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
-                configuration.setAllowedHeaders(List.of("*"));
+                configuration.setAllowedHeaders(corsConfig.getAllowedHeaders());
+                configuration.setExposedHeaders(corsConfig.getExposedHeaders());
                 configuration.setAllowCredentials(true);
 
                 UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
