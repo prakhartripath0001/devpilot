@@ -44,11 +44,13 @@ devpilot/
 │   │   │   │   ├── entity/        # JPA entities
 │   │   │   │   ├── exceptions/    # Custom exceptions and global handler
 │   │   │   │   ├── repository/    # Spring Data repositories
+│   │   │   │   ├── security/      # OAuth2 principal and user service
 │   │   │   │   └── service/       # Business logic services
 │   │   │   └── resources/
 │   │   │       ├── application.properties
 │   │   │       └── db/migration/  # Flyway SQL migrations
-│   ├── .env                       # Environment variables (gitignored)
+│   ├── .env                       # Secrets (gitignored — never commit)
+│   ├── .env.example               # Template to copy from 
 │   ├── mvnw
 │   └── pom.xml
 ├── client/                        # Next.js Frontend Application
@@ -57,7 +59,8 @@ devpilot/
 │   │   ├── provider/              # Theme and context providers
 │   │   └── ui/                    # Reusable shadcn/ui components
 │   ├── lib/                       # Utility functions
-│   ├── .env                       # Environment variables (gitignored)
+│   ├── .env                       # Secrets (gitignored — never commit)
+│   ├── .env.example               # Template to copy from 
 │   └── package.json
 ├── docker/
 │   └── postgres/
@@ -81,31 +84,40 @@ Make sure you have the following installed on your machine:
 
 ### 1. Clone and Configure Environment Variables
 
-Copy the `.env` template files and fill in your credentials:
+Each service ships with a `.env.example` template. Copy it and fill in your real values:
 
-**Backend** (`backend/.env`):
 ```bash
+# Backend
 cp backend/.env.example backend/.env
+
+# Frontend
+cp client/.env.example client/.env
 ```
 
-| Variable | Description |
-|---|---|
-| `DB_URL` | PostgreSQL connection URL |
-| `DB_USERNAME` | Database username |
-| `DB_PASSWORD` | Database password |
-| `OPENAI_API_KEY` | OpenAI API Key |
-| `GITHUB_CLIENT_ID` | GitHub OAuth2 App Client ID |
-| `GITHUB_CLIENT_SECRET` | GitHub OAuth2 App Client Secret |
-| `SERVER_PORT` | Spring Boot server port (default: `8080`) |
+>  **Never commit `.env` files.** They are gitignored by default. Only `.env.example` files (which contain no secrets) are committed.
 
-**Client** (`client/.env`):
+**Backend** (`backend/.env`) — full reference:
 
-| Variable | Description |
-|---|---|
-| `NEXT_PUBLIC_API_URL` | Backend API base URL (default: `http://localhost:8080`) |
-| `NEXT_PUBLIC_GITHUB_CLIENT_ID` | GitHub OAuth2 Client ID (public) |
+| Variable | Required | Description |
+|---|---|---|
+| `DB_URL` | Yes | PostgreSQL JDBC URL |
+| `DB_USERNAME` | Yes | Database username |
+| `DB_PASSWORD` | Yes | Database password |
+| `OPENAI_API_KEY` | Yes | OpenAI API key |
+| `ENCRYPTOR_PASSWORD` | Yes | Secret used to encrypt stored access tokens |
+| `ENCRYPTOR_SALT` | Yes | 16-char hex salt for the encryptor |
+| `GITHUB_CLIENT_ID` | Yes | GitHub OAuth2 App client ID |
+| `GITHUB_CLIENT_SECRET` | Yes | GitHub OAuth2 App client secret |
+| `SERVER_PORT` | No | Spring Boot port (default: `8080`) |
 
-> ⚠️ **Important:** Never commit `.env` files. They are gitignored by default.
+> To create a GitHub OAuth App, go to **Settings -> Developer settings -> OAuth Apps -> New OAuth App**. Set the callback URL to `http://localhost:8080/login/oauth2/code/github`.
+
+**Client** (`client/.env`) — full reference:
+
+| Variable | Required | Description |
+|---|---|---|
+| `NEXT_PUBLIC_API_URL` | Yes | Backend base URL (e.g. `http://localhost:8080`) |
+| `NEXT_PUBLIC_GITHUB_CLIENT_ID` | No | GitHub OAuth2 client ID (public-safe) |
 
 ### 2. Start the Database (PostgreSQL + pgvector)
 
