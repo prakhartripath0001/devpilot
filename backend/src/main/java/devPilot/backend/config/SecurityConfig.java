@@ -14,12 +14,19 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import lombok.RequiredArgsConstructor;
 
+import devPilot.backend.service.GitHubOAuth2UserService;
+import jakarta.servlet.http.HttpServletResponse;
+
 import java.util.List;
 
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
+
+        private final GitHubOAuth2UserService gitHubOAuth2UserService;
+        private final OAuth2SuccessHandler oAuth2SuccessHandler;
+        private final OAuth2FailureHandler oAuth2FailureHandler;
 
         @Bean
         public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -40,11 +47,17 @@ public class SecurityConfig {
                                                 .authenticationEntryPoint(
                                                                 new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)))
                                 .oauth2Login(oauth2 -> oauth2
-                                                .defaultSuccessUrl("http://localhost:3000", true)
-                                                .failureUrl("http://localhost:3000/login?error=true"))
+                                                .userInfoEndpoint(userInfo -> userInfo
+                                                                .userService(gitHubOAuth2UserService))
+                                                .successHandler(oAuth2SuccessHandler)
+                                                .failureHandler(oAuth2FailureHandler))
                                 .logout(logout -> logout
-                                                .logoutSuccessUrl("http://localhost:3000")
+                                                .logoutUrl("/api/auth/logout")
+                                                .logoutSuccessHandler((request, response, authentication) -> {
+                                                        response.setStatus(HttpStatus.NO_CONTENT.value());
+                                                })
                                                 .invalidateHttpSession(true)
+                                                .clearAuthentication(true)
                                                 .deleteCookies("JSESSIONID"));
 
                 return http.build();
