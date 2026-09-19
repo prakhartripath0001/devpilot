@@ -17,6 +17,7 @@ import {
     CardTitle,
 } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
+import { getGithubLoginUrl } from "@/lib/apiBaseUrl";
 import LoginLoading from "./loading";
 
 export default function LoginContent() {
@@ -67,7 +68,7 @@ export default function LoginContent() {
                         )}
 
                         <a
-                            href="http://localhost:8080/oauth2/authorization/github"
+                            href={getGithubLoginUrl()}
                             className={cn(
                                 buttonVariants({ variant: "default", size: "lg" }),
                                 "w-full gap-2.5 font-medium shadow-sm hover:shadow transition-all"

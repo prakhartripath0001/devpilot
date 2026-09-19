@@ -1,6 +1,20 @@
 # DevPilot
 
-DevPilot is an AI-powered developer assistant and engineering intelligence platform built with a modern full-stack architecture featuring Next.js, Spring Boot, Spring AI, and PostgreSQL with pgvector.
+DevPilot is an AI-powered developer assistant and engineering intelligence platform built to bridge the gap between software engineers and their codebases. By leveraging Retrieval-Augmented Generation (RAG), vector embeddings, and GitHub OAuth integration, DevPilot allows developers to interact naturally with their repositories, analyze code structures, and automate engineering workflows.
+
+---
+
+## What is DevPilot?
+
+DevPilot provides an intelligent interface for exploring, understanding, and chatting with code repositories in real time. It indexes your source code repositories into vector embeddings using Spring AI and PostgreSQL (`pgvector`), enabling semantic code search, context-aware AI answers, and automated code insights.
+
+### Key Capabilities & Features
+
+- **GitHub OAuth Single Sign-On (SSO)**: Authenticate seamlessly via GitHub using Spring Security OAuth2 Client to sync user profiles and repository access.
+- **Repository RAG Chat**: Perform semantic search and chat directly with your codebase using Spring AI and vector search powered by PostgreSQL `pgvector`.
+- **Encrypted Token Management**: Securely encrypt and store sensitive user OAuth tokens at rest using AES-based `TextEncryptor` credentials.
+- **Modern Full-Stack Experience**: Built with Next.js 16 (App Router), React 19, Tailwind CSS v4, and shadcn/ui featuring dark/light mode switching.
+- **Enterprise Spring Boot Backend**: Powered by Java 21, Spring Boot 4, Spring Data JPA, and Flyway database migrations.
 
 ---
 
@@ -12,7 +26,7 @@ DevPilot is an AI-powered developer assistant and engineering intelligence platf
 - **Styling:** [Tailwind CSS v4](https://tailwindcss.com/) and [shadcn/ui](https://ui.shadcn.com/)
 - **Theming:** `next-themes` (Dark / Light / System mode support)
 - **Data Fetching:** [TanStack React Query](https://tanstack.com/query/latest)
-- **Icons and Visuals:** `lucide-react`, `recharts`
+- **Icons and Visuals:** `lucide-react`, Custom SVG icons (`GithubIcon`)
 
 ### Backend (`/backend`)
 - **Framework:** [Spring Boot 4](https://spring.io/projects/spring-boot)
@@ -20,7 +34,7 @@ DevPilot is an AI-powered developer assistant and engineering intelligence platf
 - **AI Integration:** [Spring AI](https://spring.io/projects/spring-ai) (OpenAI Models and Text Embeddings)
 - **Persistence:** Spring Data JPA / Hibernate
 - **Database Migrations:** [Flyway](https://flywaydb.org/)
-- **Security:** Spring Security and OAuth2 Client (GitHub)
+- **Security:** Spring Security and OAuth2 Client (GitHub authentication)
 
 ### Database and Infrastructure
 - **Database:** PostgreSQL 16 via [pgvector/pgvector:pg16](https://hub.docker.com/r/pgvector/pgvector)
@@ -40,11 +54,13 @@ devpilot/
 │   ├── src/
 │   │   ├── main/
 │   │   │   ├── java/devPilot/backend/
-│   │   │   │   ├── config/        # Security and app configuration
-│   │   │   │   ├── entity/        # JPA entities
+│   │   │   │   ├── config/        # Security, CORS, and crypto configuration
+│   │   │   │   ├── controller/    # REST API endpoints (Auth, etc.)
+│   │   │   │   ├── dto/           # Data Transfer Objects (UserResponse, etc.)
+│   │   │   │   ├── entity/        # JPA entities (User, etc.)
 │   │   │   │   ├── exceptions/    # Custom exceptions and global handler
-│   │   │   │   ├── repository/    # Spring Data repositories
-│   │   │   │   ├── security/      # OAuth2 principal and user service
+│   │   │   │   ├── repository/    # Spring Data JPA repositories
+│   │   │   │   ├── security/      # OAuth2 principal, GitHub user service, CurrentUser
 │   │   │   │   └── service/       # Business logic services
 │   │   │   └── resources/
 │   │   │       ├── application.properties
@@ -54,11 +70,17 @@ devpilot/
 │   ├── mvnw
 │   └── pom.xml
 ├── client/                        # Next.js Frontend Application
-│   ├── app/                       # App Router pages and layout
-│   ├── components/                # UI and Provider components
+│   ├── app/                       # App Router pages and layouts
+│   │   └── login/                 # OAuth Login page, content, and loading skeleton
+│   │       ├── loading.tsx
+│   │       ├── login-content.tsx
+│   │       └── page.tsx
+│   ├── components/                # UI and Layout components
+│   │   ├── icons/                 # Custom SVG icons (GithubIcon, etc.)
+│   │   ├── layout/                # App Shell & BrandMark layout components
 │   │   ├── provider/              # Theme and context providers
 │   │   └── ui/                    # Reusable shadcn/ui components
-│   ├── lib/                       # Utility functions
+│   ├── lib/                       # Utility functions, API helpers, base URLs
 │   ├── .env                       # Secrets (gitignored — never commit)
 │   ├── .env.example               # Template to copy from 
 │   └── package.json
@@ -94,7 +116,7 @@ cp backend/.env.example backend/.env
 cp client/.env.example client/.env
 ```
 
->  **Never commit `.env` files.** They are gitignored by default. Only `.env.example` files (which contain no secrets) are committed.
+> **Never commit `.env` files.** They are gitignored by default. Only `.env.example` files (which contain no secrets) are committed.
 
 **Backend** (`backend/.env`) — full reference:
 
@@ -116,7 +138,7 @@ cp client/.env.example client/.env
 
 | Variable | Required | Description |
 |---|---|---|
-| `NEXT_PUBLIC_API_URL` | Yes | Backend base URL (e.g. `http://localhost:8080`) |
+| `NEXT_PUBLIC_API_BASE_URL` | Yes | Backend base URL (e.g. `http://localhost:8080`) |
 | `NEXT_PUBLIC_GITHUB_CLIENT_ID` | No | GitHub OAuth2 client ID (public-safe) |
 
 ### 2. Start the Database (PostgreSQL + pgvector)
@@ -163,14 +185,7 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ## Environment Variables
 
-All sensitive configuration is managed via `.env` files that are **gitignored**. The backend uses Spring's `${VAR:default}` syntax to read environment variables with sensible defaults for local development.
-
-```properties
-# Example: backend/application.properties
-spring.datasource.url=${DB_URL:jdbc:postgresql://localhost:5432/devpilot}
-spring.datasource.username=${DB_USERNAME:postgres}
-spring.datasource.password=${DB_PASSWORD:postgres}
-```
+All sensitive configuration is managed via `.env` files that are **gitignored**. The backend imports `.env` natively via `spring.config.import=optional:file:.env[.properties]` in `application.properties` and uses Spring's `${VAR:default}` syntax to read environment variables with sensible defaults for local development.
 
 ---
 
