@@ -18,6 +18,7 @@ import {
 } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { getGithubLoginUrl } from "@/lib/apiBaseUrl";
+import { LanguageIcon } from "@/components/icons/language-icon";
 import LoginLoading from "./loading";
 
 export default function LoginContent() {
@@ -77,6 +78,20 @@ export default function LoginContent() {
                             <GithubIcon className="size-5" />
                             Continue with GitHub
                         </a>
+
+                        <div className="pt-2 border-t border-border/40">
+                            <p className="text-center text-[11px] text-muted-foreground mb-2.5 font-medium">
+                                Chat & query across repositories in
+                            </p>
+                            <div className="flex items-center justify-center gap-3.5 text-muted-foreground">
+                                <span title="TypeScript"><LanguageIcon language="typescript" size={18} /></span>
+                                <span title="Python"><LanguageIcon language="python" size={18} /></span>
+                                <span title="Java"><LanguageIcon language="java" size={18} /></span>
+                                <span title="Go"><LanguageIcon language="go" size={18} /></span>
+                                <span title="Rust"><LanguageIcon language="rust" size={18} /></span>
+                                <span title="C++"><LanguageIcon language="cpp" size={18} /></span>
+                            </div>
+                        </div>
                     </CardContent>
                 </Card>
             </div>
