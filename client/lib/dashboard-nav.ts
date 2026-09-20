@@ -1,4 +1,4 @@
-import { Home, MessageSquare, Settings, type LucideIcon } from "lucide-react";
+import { Home, MessageSquare, Settings, Library, type LucideIcon } from "lucide-react";
 
 export type NavItem = {
   title: string;
@@ -14,13 +14,18 @@ export type NavGroup = {
 
 export const dashboardNavGroups: NavGroup[] = [
   {
-    label: "Overview",
+    label: "Workspace",
     items: [
       {
-        title: "Dashboard",
+        title: "Overview",
         href: "/dashboard",
         icon: Home,
         exact: true,
+      },
+      {
+        title: "Repositories",
+        href: "/dashboard/repositories",
+        icon: Library,
       },
       {
         title: "Chat",
