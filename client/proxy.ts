@@ -3,7 +3,7 @@ import type { NextRequest } from "next/server";
 
 const AUTH_COOKIE = "devpilot_auth";
 
-export function middleware(request: NextRequest) {
+export default function proxy(request: NextRequest) {
     const { pathname } = request.nextUrl;
     const isAuthed = request.cookies.get(AUTH_COOKIE)?.value === "1";
 
