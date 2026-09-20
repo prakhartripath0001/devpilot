@@ -12,6 +12,7 @@ DevPilot provides an intelligent interface for exploring, understanding, and cha
 
 - **GitHub OAuth Single Sign-On (SSO)**: Authenticate seamlessly via GitHub using Spring Security OAuth2 Client to sync user profiles and repository access.
 - **Repository RAG Chat**: Perform semantic search and chat directly with your codebase using Spring AI and vector search powered by PostgreSQL `pgvector`.
+- **Automated Repository Syncing**: Fetch, sync, and persist your connected GitHub repositories to track indexing statuses and metadata.
 - **Encrypted Token Management**: Securely encrypt and store sensitive user OAuth tokens at rest using AES-based `TextEncryptor` credentials.
 - **Modern Full-Stack Experience**: Built with Next.js 16 (App Router), React 19, Tailwind CSS v4, and shadcn/ui featuring dark/light mode switching.
 - **Enterprise Spring Boot Backend**: Powered by Java 21, Spring Boot 4, Spring Data JPA, and Flyway database migrations.
