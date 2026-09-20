@@ -45,9 +45,9 @@ export function useLogout() {
             await api.logout();
         },
         onSuccess: () => {
-            queryClient.setQueryData(queryKeys.auth.me(), null);
+            setAuthCookie(false);
             queryClient.invalidateQueries({ queryKey: queryKeys.auth.all });
-            router.push("/login");
+            router.replace("/login");
         },
     });
 }
