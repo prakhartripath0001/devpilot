@@ -6,10 +6,31 @@ import { api } from "@/lib/apiBaseUrl";
 import { queryKeys } from "@/lib/query-keys";
 import type { User } from "@/lib/api";
 
+export const AUTH_COOKIE = "devpilot_auth";
+
+export function setAuthCookie(authed: boolean) {
+    if (typeof document == "undefined") return;
+
+    if (authed) {
+        document.cookie = `${AUTH_COOKIE}=1; path=/; max-age=${60 * 60 * 24 * 7}; SameSite=Lax`;
+    } else {
+        document.cookie = `${AUTH_COOKIE}=; path=/; max-age=0; sameSite=Lax`;
+    }
+}
+
 export function useCurrentUser() {
-    return useQuery<User>({
+    return useQuery({
         queryKey: queryKeys.auth.me(),
-        queryFn: api.me,
+        queryFn: async () => {
+            try {
+                const user = await api.me();
+                setAuthCookie(true);
+                return user;
+            } catch (error) {
+                setAuthCookie(false);
+                throw error;
+            }
+        },
         retry: false,
         staleTime: 5 * 60 * 1000,
     });
@@ -20,7 +41,9 @@ export function useLogout() {
     const router = useRouter();
 
     return useMutation({
-        mutationFn: api.logout,
+        mutationFn: async () => {
+            await api.logout();
+        },
         onSuccess: () => {
             queryClient.setQueryData(queryKeys.auth.me(), null);
             queryClient.invalidateQueries({ queryKey: queryKeys.auth.all });
