@@ -26,7 +26,7 @@ export function UserButton() {
             <AvatarFallback>{user.displayName?.toString().charAt(0)?.toUpperCase() || user.githubUsername?.charAt(0)?.toUpperCase() || <User className="size-4" />}</AvatarFallback>
           </Avatar>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-56" align="end" forceMount>
+      <DropdownMenuContent className="w-56" align="end">
         <DropdownMenuLabel className="font-normal">
           <div className="flex flex-col space-y-1">
             <p className="text-sm font-medium leading-none">{user.displayName || user.githubUsername}</p>
