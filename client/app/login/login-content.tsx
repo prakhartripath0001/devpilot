@@ -1,7 +1,7 @@
 "use client";
 
-import React from "react";
-import { useSearchParams } from "next/navigation";
+import React, { useEffect } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
 import { AlertCircle } from "lucide-react";
 
 import { GithubIcon } from "@/components/icons/GithubIcon";
@@ -20,14 +20,22 @@ import { cn } from "@/lib/utils";
 import { getGithubLoginUrl } from "@/lib/apiBaseUrl";
 import { LanguageIcon } from "@/components/icons/language-icon";
 import LoginLoading from "./loading";
+import { useCurrentUser } from "@/hooks/use-auth";
 
 export default function LoginContent() {
     const params = useSearchParams();
+    const router = useRouter();
     const error = params.get("error");
+    const next = params.get("next") || "/dashboard";
+    const { data: user, isLoading } = useCurrentUser();
 
-    const isLoading = false;
+    useEffect(() => {
+        if (!isLoading && user) {
+            router.replace(next.startsWith("/") ? next : "/dashboard");
+        }
+    }, [user, isLoading, router, next]);
 
-    if (isLoading) {
+    if (isLoading || user) {
         return <LoginLoading />;
     }
 

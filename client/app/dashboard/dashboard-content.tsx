@@ -6,6 +6,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { BrandMark } from "@/components/layout/app-shell";
 import { ModeToggle } from "@/components/ui/mode-toggle";
 import { Spinner } from "@/components/ui/spinner";
+import { UserButton } from "@/components/layout/user-button";
 import { Button } from "@/components/ui/button";
 
 export function DashboardContent() {
@@ -31,18 +32,11 @@ export function DashboardContent() {
             <header className="sticky top-0 z-10 flex h-16 items-center justify-between border-b bg-background/80 px-6 backdrop-blur">
                 <BrandMark />
                 <div className="flex items-center gap-4">
-                    <span className="text-sm text-muted-foreground">
-                        Welcome, {user?.name || user?.login}
+                    <span className="text-sm text-muted-foreground hidden sm:inline-block">
+                        Welcome, {user?.displayName || user?.githubUsername}
                     </span>
                     <ModeToggle />
-                    <Button 
-                        variant="outline" 
-                        size="sm" 
-                        onClick={() => logout()} 
-                        disabled={isLoggingOut}
-                    >
-                        {isLoggingOut ? "Logging out..." : "Logout"}
-                    </Button>
+                    <UserButton />
                 </div>
             </header>
             
