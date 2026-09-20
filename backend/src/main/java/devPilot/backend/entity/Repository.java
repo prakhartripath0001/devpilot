@@ -6,16 +6,28 @@ import java.util.UUID;
 import devPilot.backend.enums.IndexStatus;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "repositories", uniqueConstraints = @UniqueConstraint(columnNames = { "user_id", "github_repo_id" }))
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class Repository {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
     @Column(name = "user_id", nullable = false)
@@ -45,13 +57,45 @@ public class Repository {
     @Column(name = "html_url", nullable = false)
     private String htmlUrl;
 
-    @Column(name = "index_status", nullable = false)
+    @Enumerated(EnumType.STRING)
+    @Column(name = "index_status", nullable = false, length = 20)
+    @Builder.Default
     private IndexStatus indexStatus = IndexStatus.PENDING;
+
+    @Column(name = "indexed_at")
     private Instant indexedAt;
+
+    @Column(name = "check_count", nullable = false)
+    @Builder.Default
     private int checkCount = 0;
+
+    @Column(name = "file_total", nullable = false)
+    @Builder.Default
     private int fileTotal = 0;
+
+    @Column(name = "total_processed", nullable = false)
+    @Builder.Default
     private long totalProcessed = 0;
+
+    @Column(name = "error_message")
     private String errorMessage;
+
+    @Column(name = "created_at", nullable = false)
+    private Instant createdAt;
+
     @Column(name = "updated_at", nullable = false)
     private Instant updatedAt;
+
+    @PrePersist
+    void onCreate() {
+        Instant now = Instant.now();
+        if (createdAt == null) {
+            createdAt = now;
+        }
+
+        updatedAt = now;
+        if (indexStatus == null) {
+            indexStatus = IndexStatus.PENDING;
+        }
+    }
 }

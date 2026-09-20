@@ -20,6 +20,8 @@ DevPilot provides an intelligent interface for exploring, understanding, and cha
 
 ## Architecture and Tech Stack
 
+> 💡 **Deep Dive:** Want to know *why* we chose this stack and how the core RAG and OAuth workflows operate? Read our [Architecture & Design Decisions](docs/architecture.md) guide.
+
 ### Frontend (`/client`)
 - **Framework:** [Next.js 16](https://nextjs.org/) (App Router) and [React 19](https://react.dev/)
 - **Language:** TypeScript
