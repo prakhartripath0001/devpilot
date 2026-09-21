@@ -159,3 +159,7 @@ export function LanguageIcon({
 }
 
 export default LanguageIcon;
+
+export function getLanguageLabel(language: string | null) {
+  return language || "Unknown";
+}
