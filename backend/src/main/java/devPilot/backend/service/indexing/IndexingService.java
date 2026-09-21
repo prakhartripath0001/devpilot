@@ -8,7 +8,7 @@ import java.util.UUID;
 
 import org.springframework.stereotype.Service;
 import org.springframework.ai.document.Document;
-import org.springframework.ai.vectorstore.VectorStore;
+// import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.ai.vectorstore.filter.FilterExpressionBuilder;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
@@ -39,7 +39,7 @@ public class IndexingService {
     private final CodeFileFilter fileFilter;
     private final CodeChunker codeChunker;
     private final GitHubRateLimiter rateLimiter;
-    private final VectorStore vectorStore;
+    // private final VectorStore vectorStore;
 
     @Value("${app.indexing.max-file-bytes:102400}")
     private long maxFileBytes;
@@ -97,7 +97,7 @@ public class IndexingService {
                 batch.addAll(chunks);
                 totalChunks += chunks.size();
                 if (batch.size() >= VECTOR_BATCH_SIZE) {
-                    vectorStore.add(batch);
+                    // vectorStore.add(batch);
                     batch.clear();
                 }
             } catch (Exception ex) {
@@ -112,7 +112,7 @@ public class IndexingService {
         }
 
         if (!batch.isEmpty()) {
-            vectorStore.add(batch);
+            // vectorStore.add(batch);
         }
 
         markReady(repoId, filePaths.size(), processed, totalChunks, repo.getFullName());
@@ -140,7 +140,7 @@ public class IndexingService {
      private void deleteExistingVectors(String repoId) {
         try {
             var filter = new FilterExpressionBuilder().eq(RagSettings.METADATA_REPO_ID, repoId).build();
-            vectorStore.delete(filter);
+            // vectorStore.delete(filter);
         } catch (Exception ex) {
             log.warn("Could not delete existing vectors for repo {}: {}", repoId, ex.getMessage());
         }

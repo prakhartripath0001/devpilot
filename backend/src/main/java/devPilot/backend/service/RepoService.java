@@ -35,7 +35,8 @@ public class RepoService {
         List<Repository> saved = new ArrayList<>();
 
         for (Map<String, Object> remote : remoteRepos) {
-            Long githubRepoId = toLong(remote.get("id"));
+            Long githubRepoIdLong = toLong(remote.get("id"));
+            String githubRepoId = String.valueOf(githubRepoIdLong);
             Repository repo = repositoryRepository
                     .findByUserIdAndGithubRepoId(userId, githubRepoId)
                     .orElseGet(Repository::new);
