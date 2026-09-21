@@ -17,7 +17,7 @@ public class CodeFileFilter {
 
         if (lowerPath.endsWith(".png") || lowerPath.endsWith(".jpg") || lowerPath.endsWith(".jpeg") ||
             lowerPath.endsWith(".gif") || lowerPath.endsWith(".svg") || lowerPath.endsWith(".ico") ||
-            lowerPath.endsWith(".pdf") || lower.endsWith(".zip") || lowerPath.endsWith(".tar") ||
+            lowerPath.endsWith(".pdf") || lowerPath.endsWith(".zip") || lowerPath.endsWith(".tar") ||
             lowerPath.endsWith(".gz") || lowerPath.endsWith(".mp4") || lowerPath.endsWith(".mp3") ||
             lowerPath.endsWith(".class") || lowerPath.endsWith(".jar") || lowerPath.endsWith(".lock")) {
             return false;
