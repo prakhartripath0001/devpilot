@@ -1,4 +1,5 @@
-import { ApiError, User } from "./api";
+import { refresh } from "next/cache";
+import { ApiError, IndexStatusResponse, Repository, User } from "./api";
 
 export function getApiBaseUrl() {
     return (
@@ -55,4 +56,12 @@ export const api = {
         apiFetch<void>("/api/auth/logout", {
             method: "POST",
         }),
+
+    listrepos: (refresh = true) =>
+        apiFetch<Repository[]>(`/api/repos?refresh=${refresh}`),
+    getRepo: (id: string) => apiFetch<Repository>(`/api/repos/${id}`),
+    startIndex: (id: string) =>
+        apiFetch<Repository>(`/api/repos/${id}/index`, { method: "POST" }),
+    indexStatus: (id: string) =>
+        apiFetch<IndexStatusResponse>(`/api/repos/${id}/index/status`)
 };
