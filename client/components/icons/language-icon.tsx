@@ -39,7 +39,7 @@ export function LanguageIcon({
         <SiTypescript
           className={cn("text-[#3178C6]", className)}
           size={size}
-          {...(props as any)}
+          {...props}
         />
       );
     case "javascript":
@@ -49,7 +49,7 @@ export function LanguageIcon({
         <SiJavascript
           className={cn("text-[#F7DF1E]", className)}
           size={size}
-          {...(props as any)}
+          {...props}
         />
       );
     case "python":
@@ -58,7 +58,7 @@ export function LanguageIcon({
         <SiPython
           className={cn("text-[#3776AB]", className)}
           size={size}
-          {...(props as any)}
+          {...props}
         />
       );
     case "java":
@@ -66,7 +66,7 @@ export function LanguageIcon({
         <FaJava
           className={cn("text-[#ED8B00]", className)}
           size={size}
-          {...(props as any)}
+          {...props}
         />
       );
     case "go":
@@ -75,7 +75,7 @@ export function LanguageIcon({
         <SiGo
           className={cn("text-[#00ADD8]", className)}
           size={size}
-          {...(props as any)}
+          {...props}
         />
       );
     case "rust":
@@ -84,7 +84,7 @@ export function LanguageIcon({
         <SiRust
           className={cn("text-[#DEA584] dark:text-foreground", className)}
           size={size}
-          {...(props as any)}
+          {...props}
         />
       );
     case "c++":
@@ -94,7 +94,7 @@ export function LanguageIcon({
         <SiCplusplus
           className={cn("text-[#00599C]", className)}
           size={size}
-          {...(props as any)}
+          {...props}
         />
       );
     case "ruby":
@@ -103,7 +103,7 @@ export function LanguageIcon({
         <SiRuby
           className={cn("text-[#CC342D]", className)}
           size={size}
-          {...(props as any)}
+          {...props}
         />
       );
     case "php":
@@ -111,7 +111,7 @@ export function LanguageIcon({
         <SiPhp
           className={cn("text-[#777BB4]", className)}
           size={size}
-          {...(props as any)}
+          {...props}
         />
       );
     case "kotlin":
@@ -120,7 +120,7 @@ export function LanguageIcon({
         <SiKotlin
           className={cn("text-[#7F52FF]", className)}
           size={size}
-          {...(props as any)}
+          {...props}
         />
       );
     case "swift":
@@ -128,7 +128,7 @@ export function LanguageIcon({
         <SiSwift
           className={cn("text-[#F05138]", className)}
           size={size}
-          {...(props as any)}
+          {...props}
         />
       );
     case "html":
@@ -136,7 +136,7 @@ export function LanguageIcon({
         <SiHtml5
           className={cn("text-[#E34F26]", className)}
           size={size}
-          {...(props as any)}
+          {...props}
         />
       );
     case "css":
@@ -144,7 +144,7 @@ export function LanguageIcon({
         <SiCss
           className={cn("text-[#1572B6]", className)}
           size={size}
-          {...(props as any)}
+          {...props}
         />
       );
     default:
@@ -152,7 +152,7 @@ export function LanguageIcon({
         <IoLanguageOutline
           className={cn("text-muted-foreground", className)}
           size={size}
-          {...(props as any)}
+          {...props}
         />
       );
   }

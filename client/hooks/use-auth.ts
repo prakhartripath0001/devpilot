@@ -4,7 +4,6 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { api } from "@/lib/apiBaseUrl";
 import { queryKeys } from "@/lib/query-keys";
-import type { User } from "@/lib/api";
 
 export const AUTH_COOKIE = "devpilot_auth";
 

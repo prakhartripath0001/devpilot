@@ -1,4 +1,3 @@
-import { refresh } from "next/cache";
 import { ApiError, IndexStatusResponse, Repository, User } from "./api";
 
 export function getApiBaseUrl() {
