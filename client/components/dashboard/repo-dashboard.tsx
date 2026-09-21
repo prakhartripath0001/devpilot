@@ -104,7 +104,11 @@ export function RepoDashboard() {
         {reposQuery.isSuccess && filtered.length > 0 && (
           <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
             {filtered.map((repo) => (
-              <RepoCard key={repo.id} repo={repo} />
+              <RepoCard
+                key={repo.id}
+                repo={repo}
+                onVisibilityClick={setVisibility}
+              />
             ))}
           </div>
         )}

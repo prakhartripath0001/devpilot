@@ -29,6 +29,7 @@ export function LanguageIcon({
   size = 16,
   ...props
 }: LanguageIconProps) {
+  const normalizedSize = size === "sm" ? 12 : size === "md" ? 16 : size === "lg" ? 20 : size;
   const normalized = language?.trim().toLowerCase() || "";
 
   switch (normalized) {
@@ -38,7 +39,7 @@ export function LanguageIcon({
       return (
         <SiTypescript
           className={cn("text-[#3178C6]", className)}
-          size={size}
+          size={normalizedSize}
           {...props}
         />
       );
@@ -48,7 +49,7 @@ export function LanguageIcon({
       return (
         <SiJavascript
           className={cn("text-[#F7DF1E]", className)}
-          size={size}
+          size={normalizedSize}
           {...props}
         />
       );
@@ -57,7 +58,7 @@ export function LanguageIcon({
       return (
         <SiPython
           className={cn("text-[#3776AB]", className)}
-          size={size}
+          size={normalizedSize}
           {...props}
         />
       );
@@ -65,7 +66,7 @@ export function LanguageIcon({
       return (
         <FaJava
           className={cn("text-[#ED8B00]", className)}
-          size={size}
+          size={normalizedSize}
           {...props}
         />
       );
@@ -74,7 +75,7 @@ export function LanguageIcon({
       return (
         <SiGo
           className={cn("text-[#00ADD8]", className)}
-          size={size}
+          size={normalizedSize}
           {...props}
         />
       );
@@ -83,7 +84,7 @@ export function LanguageIcon({
       return (
         <SiRust
           className={cn("text-[#DEA584] dark:text-foreground", className)}
-          size={size}
+          size={normalizedSize}
           {...props}
         />
       );
@@ -93,7 +94,7 @@ export function LanguageIcon({
       return (
         <SiCplusplus
           className={cn("text-[#00599C]", className)}
-          size={size}
+          size={normalizedSize}
           {...props}
         />
       );
@@ -102,7 +103,7 @@ export function LanguageIcon({
       return (
         <SiRuby
           className={cn("text-[#CC342D]", className)}
-          size={size}
+          size={normalizedSize}
           {...props}
         />
       );
@@ -110,7 +111,7 @@ export function LanguageIcon({
       return (
         <SiPhp
           className={cn("text-[#777BB4]", className)}
-          size={size}
+          size={normalizedSize}
           {...props}
         />
       );
@@ -119,7 +120,7 @@ export function LanguageIcon({
       return (
         <SiKotlin
           className={cn("text-[#7F52FF]", className)}
-          size={size}
+          size={normalizedSize}
           {...props}
         />
       );
@@ -127,7 +128,7 @@ export function LanguageIcon({
       return (
         <SiSwift
           className={cn("text-[#F05138]", className)}
-          size={size}
+          size={normalizedSize}
           {...props}
         />
       );
@@ -135,7 +136,7 @@ export function LanguageIcon({
       return (
         <SiHtml5
           className={cn("text-[#E34F26]", className)}
-          size={size}
+          size={normalizedSize}
           {...props}
         />
       );
@@ -143,7 +144,7 @@ export function LanguageIcon({
       return (
         <SiCss
           className={cn("text-[#1572B6]", className)}
-          size={size}
+          size={normalizedSize}
           {...props}
         />
       );
@@ -151,7 +152,7 @@ export function LanguageIcon({
       return (
         <IoLanguageOutline
           className={cn("text-muted-foreground", className)}
-          size={size}
+          size={normalizedSize}
           {...props}
         />
       );

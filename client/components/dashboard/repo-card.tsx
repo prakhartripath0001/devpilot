@@ -9,12 +9,14 @@ import {
     MessageSquare,
     RotateCcw,
     Sparkles,
+    Globe,
 } from "lucide-react";
 
 import { IndexErrorAlert } from "@/components/dashboard/index-error-alert";
 import { LanguageBadge } from "@/components/dashboard/language-badge";
 import { IndexStatusBadge } from "@/components/dashboard/repo-status";
 import { LanguageIcon } from "@/components/icons/language-icon";
+import { GithubIcon } from "@/components/icons/GithubIcon";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Spinner } from "@/components/ui/spinner";
@@ -22,7 +24,13 @@ import { getRepoProgress, useStartIndexing } from "@/hooks/use-repo";
 import type { Repository } from "@/lib/api";
 import { cn } from "@/lib/utils";
 
-export function RepoCard({ repo }: { repo: Repository }) {
+export function RepoCard({
+    repo,
+    onVisibilityClick,
+}: {
+    repo: Repository;
+    onVisibilityClick?: (visibility: "public" | "private") => void;
+}) {
     const router = useRouter();
     const indexMutation = useStartIndexing();
     const isIndexing = repo.indexStatus === "INDEXING" || indexMutation.isPending;
@@ -46,26 +54,34 @@ export function RepoCard({ repo }: { repo: Repository }) {
     return (
         <article
             className={cn(
-                "group flex flex-col overflow-hidden rounded-2xl border border-dashed bg-card/80 shadow-md shadow-foreground/5 transition-all",
+                "group flex h-full min-h-[260px] flex-col overflow-hidden rounded-xl border bg-background/50 shadow-sm backdrop-blur-sm transition-all duration-300",
                 isFailed
-                    ? "border-destructive/30 bg-destructive/2 hover:border-destructive/40"
-                    : "border-border/80 hover:-translate-y-0.5 hover:border-foreground/15 hover:shadow-lg hover:shadow-foreground/10"
+                    ? "border-destructive/30 bg-destructive/5 hover:border-destructive/40 hover:shadow-md"
+                    : "border-border/50 hover:-translate-y-1 hover:border-border/80 hover:bg-background/80 hover:shadow-md"
             )}
         >
-            <div className="border-b border-dashed border-border/70 p-4">
+            <div className="border-b border-border/50 p-5">
                 <div className="flex items-start justify-between gap-3">
                     <div className="flex min-w-0 items-start gap-3">
-                        <LanguageBadge language={repo.language} showLabel={false} />
+                        <LanguageBadge language={repo.language} showLabel={false} iconSize="sm" />
                         <div className="min-w-0">
                             <p className="truncate text-xs text-muted-foreground">{repo.owner}</p>
-                            <h3 className="truncate font-medium">{repo.name}</h3>
+                            <a 
+                                href={repo.htmlUrl || "#"} 
+                                target="_blank" 
+                                rel="noreferrer"
+                                className="flex items-center gap-1.5 hover:underline"
+                            >
+                                <GithubIcon className="size-3.5" />
+                                <h3 className="truncate font-medium">{repo.name}</h3>
+                            </a>
                         </div>
                     </div>
                     <IndexStatusBadge status={repo.indexStatus} />
                 </div>
             </div>
 
-            <div className="flex flex-1 flex-col gap-3 p-4">
+            <div className="flex flex-1 flex-col gap-4 p-5">
                 {!isFailed && (
                     <p className="line-clamp-2 min-h-10 text-sm text-muted-foreground">
                         {repo.description || "No description provided."}
@@ -79,18 +95,37 @@ export function RepoCard({ repo }: { repo: Repository }) {
                 )}
 
                 <div className="flex flex-wrap items-center gap-2">
-                    {repo.isPrivate && (
-                        <span className="inline-flex items-center gap-1 rounded-full border border-dashed px-2 py-0.5 text-xs text-muted-foreground">
+                    {repo.isPrivate ? (
+                        <button
+                            type="button"
+                            onClick={(e) => {
+                                e.preventDefault();
+                                onVisibilityClick?.("private");
+                            }}
+                            className="inline-flex items-center gap-1 rounded-full border border-border/60 bg-muted/30 px-2.5 py-0.5 text-xs font-medium text-muted-foreground hover:bg-muted/50 hover:text-foreground transition-colors cursor-pointer"
+                        >
                             <Lock className="size-3" />
                             Private
-                        </span>
+                        </button>
+                    ) : (
+                        <button
+                            type="button"
+                            onClick={(e) => {
+                                e.preventDefault();
+                                onVisibilityClick?.("public");
+                            }}
+                            className="inline-flex items-center gap-1 rounded-full border border-border/60 bg-muted/30 px-2.5 py-0.5 text-xs font-medium text-muted-foreground hover:bg-muted/50 hover:text-foreground transition-colors cursor-pointer"
+                        >
+                            <Globe className="size-3" />
+                            Public
+                        </button>
                     )}
                     <span className="inline-flex items-center gap-1 rounded-full border border-dashed px-2 py-0.5 text-xs text-muted-foreground">
                         <GitBranch className="size-3" />
                         {repo.defaultBranch}
                     </span>
                     {repo.language && (
-                        <span className="inline-flex items-center gap-1.5 rounded-full border border-dashed px-2 py-0.5 text-xs">
+                        <span className="inline-flex items-center gap-1.5 rounded-full border border-border/60 bg-muted/30 px-2.5 py-0.5 text-xs font-medium">
                             <LanguageIcon language={repo.language} size="sm" />
                             {repo.language}
                         </span>
@@ -98,7 +133,7 @@ export function RepoCard({ repo }: { repo: Repository }) {
                     {repo.chunkCount > 0 && (
                         <span
                             className={cn(
-                                "rounded-full border border-dashed px-2 py-0.5 text-xs",
+                                "rounded-full border border-border/60 bg-muted/30 px-2.5 py-0.5 text-xs font-medium",
                                 isFailed
                                     ? "border-destructive/20 text-destructive/80"
                                     : "text-muted-foreground"
@@ -111,7 +146,7 @@ export function RepoCard({ repo }: { repo: Repository }) {
                 </div>
 
                 {isIndexing && (
-                    <div className="space-y-2 rounded-xl border border-dashed bg-muted/30 p-3">
+                    <div className="mt-auto space-y-2 rounded-xl border border-border/50 bg-muted/20 p-3">
                         <div className="flex items-center justify-between text-xs text-muted-foreground">
                             <span>Indexing…</span>
                             <span>
@@ -127,7 +162,7 @@ export function RepoCard({ repo }: { repo: Repository }) {
                 )}
             </div>
 
-            <div className="mt-auto flex items-center justify-between gap-2 border-t border-dashed border-border/70 p-4">
+            <div className="mt-auto flex items-center justify-between gap-3 border-t border-border/50 bg-muted/10 p-4 sm:p-5">
                 {repo.htmlUrl ? (
                     <Button
                         variant="ghost"
