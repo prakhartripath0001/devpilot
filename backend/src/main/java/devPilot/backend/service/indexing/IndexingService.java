@@ -13,7 +13,7 @@ import org.springframework.ai.vectorstore.filter.FilterExpressionBuilder;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 
-import devPilot.backend.entity.IndexStatus;
+import devPilot.backend.enums.IndexStatus;
 import devPilot.backend.entity.Repository;
 import devPilot.backend.exceptions.BadRequestException;
 import devPilot.backend.exceptions.NotFoundException;
@@ -53,9 +53,9 @@ public class IndexingService {
         }
 
         repo.setIndexStatus(IndexStatus.INDEXING);
-        repo.setFilesProcessed(0);
-        repo.setFilesTotal(0);
-        repo.setChunkCount(0);
+        repo.setTotalProcessed(0);
+        repo.setFileTotal(0);
+        repo.setCheckCount(0);
         repo.setErrorMessage(null);
         repo.setUpdatedAt(Instant.now());
         return repositoryRepository.save(repo);
@@ -155,9 +155,9 @@ public class IndexingService {
             IndexStatus status,
             String error) {
         repositoryRepository.findById(repoId).ifPresent(repo -> {
-            repo.setFilesTotal(total);
-            repo.setFilesProcessed(processed);
-            repo.setChunkCount(chunks);
+            repo.setFileTotal(total);
+            repo.setTotalProcessed(processed);
+            repo.setCheckCount(chunks);
             repo.setIndexStatus(status);
             repo.setErrorMessage(error);
             repo.setUpdatedAt(Instant.now());
@@ -168,10 +168,10 @@ public class IndexingService {
       @Transactional
     protected void markReady(UUID repoId, int totalFiles, int processedFiles, int totalChunks, String fullName) {
         repositoryRepository.findById(repoId).ifPresent(repo -> {
-            repo.setIndexStatus(IndexStatus.READY);
-            repo.setFilesTotal(totalFiles);
-            repo.setFilesProcessed(processedFiles);
-            repo.setChunkCount(totalChunks);
+            repo.setIndexStatus(IndexStatus.COMPLETED);
+            repo.setFileTotal(totalFiles);
+            repo.setTotalProcessed(processedFiles);
+            repo.setCheckCount(totalChunks);
             repo.setIndexedAt(Instant.now());
             repo.setErrorMessage(null);
             repo.setUpdatedAt(Instant.now());
