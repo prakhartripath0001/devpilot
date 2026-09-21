@@ -1,10 +1,12 @@
 package devPilot.backend.service.indexing;
 
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.IntStream;
 
 import org.springframework.ai.document.Document;
+import org.springframework.ai.transformer.splitter.TokenTextSplitter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -12,45 +14,56 @@ import devPilot.backend.service.ai.RagSettings;
 
 @Component
 public class CodeChunker {
-
-    private final int chunkSize;
-    private final int chunkOverlap;
+    private final TokenTextSplitter splitter;
+    private final CodeFileFilter fileFilter;
 
     public CodeChunker(
             @Value("${app.indexing.chunk-size:800}") int chunkSize,
-            @Value("${app.indexing.chunk-overlap:100}") int chunkOverlap) {
-        this.chunkSize = chunkSize;
-        this.chunkOverlap = chunkOverlap;
+            CodeFileFilter fileFilter) {
+        // Spring AI splits by tokens; ~4 characters per token is a reasonable default for code.
+        int chunkTokens = Math.max(50, chunkSize / 4);
+
+        this.splitter = TokenTextSplitter.builder()
+                .withChunkSize(chunkTokens)
+                .build();
+        this.fileFilter = fileFilter;
     }
 
-    public List<Document> chunkFile(String repoId, String path, String content) {
+    public List<Document> chunkFile(String repoId, String filePath, String content) {
         if (content == null || content.isBlank()) {
             return List.of();
         }
 
-        List<Document> documents = new ArrayList<>();
-        int length = content.length();
-        int i = 0;
-        int chunkIndex = 0;
-        
-        while (i < length) {
-            int end = Math.min(i + chunkSize, length);
-            String chunk = content.substring(i, end);
+        String language = fileFilter.detectLanguage(filePath);
+        String header = "// File: " + filePath + "\n";
 
-            Document doc = new Document(chunk, Map.of(
-                    RagSettings.METADATA_REPO_ID, repoId,
-                    RagSettings.METADATA_FILE_PATH, path,
-                    "chunkIndex", chunkIndex++
-            ));
-            documents.add(doc);
+        Document source = new Document(header + content, baseMetadata(repoId, filePath, language));
+        List<Document> split = splitter.apply(List.of(source));
 
-            if (end == length) {
-                break;
-            }
-            // Move forward by chunkSize minus overlap
-            i += Math.max(1, chunkSize - chunkOverlap);
-        }
+        return IntStream.range(0, split.size())
+                .mapToObj(i -> withChunkIndex(split.get(i), repoId, filePath, language, i))
+                .toList();
+    }
 
-        return documents;
+    private static Map<String, Object> baseMetadata(String repoId, String filePath, String language) {
+        Map<String, Object> metadata = new HashMap<>();
+        metadata.put(RagSettings.METADATA_REPO_ID, repoId);
+        metadata.put("filePath", filePath);
+        metadata.put("language", language);
+        return metadata;
+    }
+
+    private static Document withChunkIndex(
+            Document chunk,
+            String repoId,
+            String filePath,
+            String language,
+            int chunkIndex) {
+        Map<String, Object> metadata = new HashMap<>(chunk.getMetadata());
+        metadata.put(RagSettings.METADATA_REPO_ID, repoId);
+        metadata.put("filePath", filePath);
+        metadata.put("language", language);
+        metadata.put("chunkIndex", chunkIndex);
+        return new Document(chunk.getText(), metadata);
     }
 }
