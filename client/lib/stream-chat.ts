@@ -1,37 +1,47 @@
-import { ChatMessage } from "@/lib/api";
-import { getApiBaseUrl } from "@/lib/apiBaseUrl";
+import { getApiBaseUrl, ApiError, type ChatMessage } from "@/lib/api";
 
-export interface StreamChatOptions {
-  signal?: AbortSignal;
+export type StreamChatHandlers = {
   onUserMessage?: (message: ChatMessage) => void;
   onToken?: (token: string) => void;
   onAssistantMessage?: (message: ChatMessage) => void;
-}
+  onDone?: () => void;
+  onError?: (error: Error) => void;
+  signal?: AbortSignal;
+};
 
 export async function streamChatMessage(
   sessionId: string,
   content: string,
-  options?: StreamChatOptions
+  handlers: StreamChatHandlers = {}
 ): Promise<void> {
-  const url = `${getApiBaseUrl()}/api/chat/sessions/${sessionId}/messages`;
-  const response = await fetch(url, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    credentials: "include",
-    body: JSON.stringify({ content }),
-    signal: options?.signal,
-  });
+  const res = await fetch(
+    `${getApiBaseUrl()}/api/chat/sessions/${sessionId}/messages`,
+    {
+      method: "POST",
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ content }),
+      signal: handlers.signal,
+    }
+  );
 
-  if (!response.ok) {
-    throw new Error(`Chat error: ${response.statusText}`);
+  if (!res.ok) {
+    let message = res.statusText;
+    try {
+      const data = await res.json();
+      message = data.message ?? data.error ?? message;
+    } catch {
+      // ignore
+    }
+    throw new ApiError(res.status, message);
   }
 
-  const reader = response.body?.getReader();
-  if (!reader) return;
+  if (!res.body) {
+    throw new Error("No response body for SSE stream");
+  }
 
-  const decoder = new TextDecoder("utf-8");
+  const reader = res.body.getReader();
+  const decoder = new TextDecoder();
   let buffer = "";
 
   while (true) {
@@ -39,43 +49,44 @@ export async function streamChatMessage(
     if (done) break;
 
     buffer += decoder.decode(value, { stream: true });
-    const lines = buffer.split("\n");
-    buffer = lines.pop() ?? "";
+    const parts = buffer.split("\n\n");
+    buffer = parts.pop() ?? "";
 
-    let currentEvent = "";
+    for (const part of parts) {
+      if (!part.trim()) continue;
 
-    for (const line of lines) {
-      const trimmed = line.trim();
-      if (!trimmed) continue;
+      const lines = part.split("\n");
+      let event = "message";
+      const dataLines: string[] = [];
 
-      if (trimmed.startsWith("event:")) {
-        currentEvent = trimmed.substring(6).trim();
-      } else if (trimmed.startsWith("data:")) {
-        const dataStr = trimmed.substring(5).trim();
-
-        if (currentEvent === "user_message") {
-          try {
-            const userMsg = JSON.parse(dataStr) as ChatMessage;
-            options?.onUserMessage?.(userMsg);
-          } catch {
-            // ignore
-          }
-        } else if (currentEvent === "token") {
-          try {
-            const token = JSON.parse(dataStr) as string;
-            options?.onToken?.(token);
-          } catch {
-            options?.onToken?.(dataStr);
-          }
-        } else if (currentEvent === "assistant_message") {
-          try {
-            const assistantMsg = JSON.parse(dataStr) as ChatMessage;
-            options?.onAssistantMessage?.(assistantMsg);
-          } catch {
-            // ignore
-          }
+      for (const line of lines) {
+        if (line.startsWith("event:")) {
+          event = line.slice(6).trim();
+        } else if (line.startsWith("data:")) {
+          dataLines.push(line.slice(5).trimStart());
         }
+      }
+
+      const data = dataLines.join("\n");
+      if (!data) continue;
+
+      try {
+        if (event === "token") {
+          handlers.onToken?.(JSON.parse(data) as string);
+        } else if (event === "user_message") {
+          handlers.onUserMessage?.(JSON.parse(data) as ChatMessage);
+        } else if (event === "assistant_message") {
+          handlers.onAssistantMessage?.(JSON.parse(data) as ChatMessage);
+        } else if (event === "done") {
+          handlers.onDone?.();
+        }
+      } catch (err) {
+        handlers.onError?.(
+          err instanceof Error ? err : new Error("Failed to parse SSE event")
+        );
       }
     }
   }
+
+  handlers.onDone?.();
 }

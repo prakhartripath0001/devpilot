@@ -1,20 +1,27 @@
 package devPilot.backend.security;
 
-import devPilot.backend.entity.User;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.oauth2.core.user.OAuth2User;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
+
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.oauth2.core.user.OAuth2User;
+
+import devPilot.backend.entity.User;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
 public class AppUserPrincipal implements OAuth2User {
     private final User user;
     private final Map<String, Object> attributes;
+
+    public UUID getId() {
+        return user.getId();
+    }
 
     @Override
     public Map<String, Object> getAttributes() {
