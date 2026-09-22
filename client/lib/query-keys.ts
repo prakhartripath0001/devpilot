@@ -13,8 +13,8 @@ export const queryKeys = {
         all: ["chat"] as const,
         sessions: (repositoryId: string) =>
             [...queryKeys.chat.all, "sessions", repositoryId] as const,
-        messages: (repositoryId: string, sessionId: string) =>
-            [...queryKeys.chat.sessions(repositoryId), "messages", sessionId] as const,
+        messages: (sessionId: string) =>
+            [...queryKeys.chat.all, "messages", sessionId] as const,
     },
     fileTree: {
         all: ["fileTree"] as const,

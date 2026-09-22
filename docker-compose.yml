@@ -25,38 +25,38 @@ services:
       retries: 5
       start_period: 10s
 
-#  backend:
-#    build:
-#      context: ./backend
-#      dockerfile: Dockerfile
-#    container_name: devpilot-backend
-#    ports:
-#      - "8080:8080"
-#    environment:
-#      - DB_URL=jdbc:postgresql://postgres:5432/devpilot
-#      - DB_USERNAME=postgres
-#      - DB_PASSWORD=postgres
-#      - OPENAI_API_KEY=${OPENAI_API_KEY}
-#      - ENCRYPTOR_PASSWORD=${ENCRYPTOR_PASSWORD}
-#      - ENCRYPTOR_SALT=${ENCRYPTOR_SALT}
-#      - GITHUB_CLIENT_ID=${GITHUB_CLIENT_ID}
-#      - GITHUB_CLIENT_SECRET=${GITHUB_CLIENT_SECRET}
-#    depends_on:
-#      postgres:
-#        condition: service_healthy
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: devpilot-backend
+    ports:
+      - "8080:8080"
+    environment:
+      - DB_URL=jdbc:postgresql://postgres:5432/devpilot
+      - DB_USERNAME=postgres
+      - DB_PASSWORD=postgres
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - ENCRYPTOR_PASSWORD=${ENCRYPTOR_PASSWORD}
+      - ENCRYPTOR_SALT=${ENCRYPTOR_SALT}
+      - GITHUB_CLIENT_ID=${GITHUB_CLIENT_ID}
+      - GITHUB_CLIENT_SECRET=${GITHUB_CLIENT_SECRET}
+    depends_on:
+      postgres:
+        condition: service_healthy
 
-#  client:
-#    build:
-#      context: ./client
-#      dockerfile: Dockerfile
-#    container_name: devpilot-client
-#    ports:
-#      - "3000:3000"
-#    environment:
-#      - NEXT_PUBLIC_API_BASE_URL=http://localhost:8080
-#      - NEXT_PUBLIC_GITHUB_CLIENT_ID=${NEXT_PUBLIC_GITHUB_CLIENT_ID}
-#    depends_on:
-#      - backend
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    container_name: devpilot-client
+    ports:
+      - "3000:3000"
+    environment:
+      - NEXT_PUBLIC_API_BASE_URL=http://localhost:8080
+      - NEXT_PUBLIC_GITHUB_CLIENT_ID=${NEXT_PUBLIC_GITHUB_CLIENT_ID}
+    depends_on:
+      - backend
 
 volumes:
   postgres_data:
