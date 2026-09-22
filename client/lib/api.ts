@@ -24,6 +24,7 @@ export type Repository = {
     chunkCount: number;
     filesTotal: number;
     filesProceed: number;
+    filesProcessed?: number;
     errorMessage: string | null;
 }
 
@@ -45,3 +46,25 @@ export class ApiError extends Error {
         this.status = status;
     }
 }
+
+export type Citation = {
+    filePath: string;
+    startLine?: number;
+    endLine?: number;
+    language?: string;
+};
+
+export type ChatMessage = {
+    id: string;
+    role: "USER" | "ASSISTANT";
+    content: string;
+    citations?: Citation[];
+    createdAt?: string;
+};
+
+export type ChatSession = {
+    id: string;
+    repositoryId: string;
+    title: string;
+    createdAt: string;
+};

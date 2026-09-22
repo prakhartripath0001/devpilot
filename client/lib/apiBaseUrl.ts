@@ -1,4 +1,4 @@
-import { ApiError, IndexStatusResponse, Repository, User } from "./api";
+import { ApiError, ChatMessage, ChatSession, IndexStatusResponse, Repository, User } from "./api";
 
 export function getApiBaseUrl() {
     return (
@@ -62,5 +62,15 @@ export const api = {
     startIndex: (id: string) =>
         apiFetch<Repository>(`/api/repos/${id}/index`, { method: "POST" }),
     indexStatus: (id: string) =>
-        apiFetch<IndexStatusResponse>(`/api/repos/${id}/index/status`)
+        apiFetch<IndexStatusResponse>(`/api/repos/${id}/index/status`),
+
+    listChatSessions: (repoId: string) =>
+        apiFetch<ChatSession[]>(`/api/repos/${repoId}/chat/sessions`),
+    createChatSession: (repoId: string, title?: string) =>
+        apiFetch<ChatSession>(`/api/repos/${repoId}/chat/sessions`, {
+            method: "POST",
+            body: JSON.stringify({ title: title || "New chat" }),
+        }),
+    getChatMessages: (repoId: string, sessionId: string) =>
+        apiFetch<ChatMessage[]>(`/api/repos/${repoId}/chat/sessions/${sessionId}/messages`),
 };

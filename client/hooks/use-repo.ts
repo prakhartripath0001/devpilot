@@ -115,10 +115,12 @@ export function useRefreshRepos() {
   });
 }
 
-export function getRepoProgress(repo: Pick<
-  Repository,
-  "filesProceed" | "filesTotal"
->) {
+export function getRepoProgress(repo: {
+  filesProcessed?: number;
+  filesProceed?: number;
+  filesTotal: number;
+}) {
   if (!repo.filesTotal) return 0;
-  return Math.min(100, Math.round((repo.filesProceed / repo.filesTotal) * 100));
+  const processed = repo.filesProcessed ?? repo.filesProceed ?? 0;
+  return Math.min(100, Math.round((processed / repo.filesTotal) * 100));
 }
