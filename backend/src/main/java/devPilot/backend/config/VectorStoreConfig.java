@@ -11,8 +11,15 @@ import org.springframework.jdbc.core.JdbcTemplate;
 public class VectorStoreConfig {
 
     @Bean
-    public VectorStore vectorStore(JdbcTemplate jdbcTemplate, EmbeddingModel embeddingModel) {
+    public VectorStore vectorStore(
+            JdbcTemplate jdbcTemplate,
+            EmbeddingModel embeddingModel,
+            @org.springframework.beans.factory.annotation.Value("${spring.ai.vectorstore.pgvector.dimension:768}") int dimension,
+            @org.springframework.beans.factory.annotation.Value("${spring.ai.vectorstore.pgvector.initialize-schema:true}") boolean initializeSchema
+    ) {
         return PgVectorStore.builder(jdbcTemplate, embeddingModel)
+                .dimensions(dimension)
+                .initializeSchema(initializeSchema)
                 .build();
     }
 }
