@@ -1,0 +1,25 @@
+#!/bin/sh
+
+# DevPilot pre-commit hook
+echo "[devpilot] Running pre-commit lint check..."
+
+REPO_ROOT="$(git rev-parse --show-toplevel)"
+
+# Check if any client files are staged
+STAGED_CLIENT_FILES=$(git diff --cached --name-only --diff-filter=ACM | grep '^client/' || true)
+
+if [ -n "$STAGED_CLIENT_FILES" ]; then
+  echo "[devpilot] Staged changes detected in client/. Running npm run lint..."
+  cd "$REPO_ROOT/client" || exit 1
+  npm run lint
+  STATUS=$?
+  if [ $STATUS -ne 0 ]; then
+    echo ""
+    echo "[devpilot] Commit rejected: Lint check failed."
+    echo "[devpilot] Please resolve the lint errors above before committing."
+    exit $STATUS
+  fi
+fi
+
+echo "[devpilot] Pre-commit checks passed."
+exit 0

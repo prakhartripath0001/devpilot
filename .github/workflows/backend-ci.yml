@@ -53,6 +53,7 @@ jobs:
           DB_URL: jdbc:postgresql://localhost:5432/devpilot
           DB_USERNAME: devpilot
           DB_PASSWORD: password
+          GEMINI_API_KEY: dummy-key-for-test
           OPENAI_API_KEY: dummy-key-for-test
           ENCRYPTOR_PASSWORD: dummy-password-12345
           ENCRYPTOR_SALT: 5c0744940b5c369b
